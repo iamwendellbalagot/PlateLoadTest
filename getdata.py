@@ -56,16 +56,20 @@ class GetData:
         
     def upload_generate(self, port='', baud=9600, n=10,
                         table = 'table',
-                        inc = 'none',
+                        inc = 0,
                         area = 0,
                         set1 =0,
                         set2=0,
+                        w_plate = 0,
+                        w_footing = 0,
+                        fs = 1,
                         path='./databases/serverdb.db'):
         arduino = serial.Serial(port, baud)
         try:
             conn = sqlite3.connect(path)
             c = conn.cursor()
             readings = []
+            
             for i in tqdm(range(n)):
                 data = arduino.readline()[:-2].decode('utf-8')
                 data = [float(i) for i in data.split('\t')]
@@ -73,23 +77,37 @@ class GetData:
                 data.append(round(data[2]/ area,1))
                 data.append(set1)
                 data.append(set2)
+                data.append(area)
+                data.append(w_plate)
+                data.append(w_footing)
+                data.append(fs)
+                data.append(n)
                 readings.append(data)
                 
-                c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?);',tuple(data));
+                c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?,?,?,?,?,?);',tuple(data));
                 conn.commit()
-            df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2'])
+            print('FFF')
+            df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2',
+                                                 'PLATE_AREA', 'WIDTH_PLATE', 'WIDTH_FOOTING', 'FOS', 'TIME'])
+            print('DF RETURNED')
             return df
             conn.close()
         except:
+            print('DUPP')
             conn.close()
             query = '''CREATE TABLE IF NOT EXISTS {0} (
                                         S1 REAL,
                                         S2 REAL,
                                         S3 REAL,
-                                        INCREMENT TEXT,
+                                        INCREMENT REAL,
                                         PRESSURE REAL,
                                         INITIAL_SET1 REAL,
-                                        INITIAL_SET2 REAL
+                                        INITIAL_SET2 REAL,
+                                        PLATE_AREA REAL,
+                                        WIDTH_PLATE REAL,
+                                        WIDTH_FOOTING REAL,
+                                        FOS REAL,
+                                        TIME_OF_TEST REAL
 
                                     );'''.format(table)
             conn = sqlite3.connect(path)
@@ -103,11 +121,18 @@ class GetData:
                 data.append(round(data[2]/ area,1))
                 data.append(set1)
                 data.append(set2)
+                data.append(area)
+                data.append(w_plate)
+                data.append(w_footing)
+                data.append(fs)
+                data.append(n)
                 readings.append(data)
                 
-                c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?);',tuple(data));
+                c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?,?,?,?,?,?);',tuple(data));
                 conn.commit()
-            df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2'])
+            df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2',
+                                                 'PLATE_AREA', 'WIDTH_PLATE', 'WIDTH_FOOTING', 'FOS', 'TIME'])
+            print('DF2 RETURNED')
             return df
             conn.close()
         
@@ -121,7 +146,7 @@ class GetData:
     
     
     def get_PS(self,df):
-        summmary_df = pd.DataFrame(columns = ['P', 'S1', 'S2'])
+        summmary_df = pd.DataFrame(columns = ['P', 'S1', 'S2', 'S1_S2'])
         df['diff1'] = (df.S1.values - df.INITIAL_SET1.values) * 10
         df['diff2'] = (df.S2.values - df.INITIAL_SET2.values) * 10
 
@@ -132,10 +157,12 @@ class GetData:
             set1_per_inc.append(df[df['INCREMENT']==increment]['diff1'].iloc[-1])
             set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-1])
 
-
-        summmary_df['P'] = df.groupby('INCREMENT').mean()['PRESSURE']
         summmary_df['S1'] = np.array(set1_per_inc)
         summmary_df['S2'] = np.array(set2_per_inc)
-        summmary_df['S'] = (summmary_df.S1.values + summmary_df.S2.values) / 2
+        summmary_df['S1_S2'] = np.array(summmary_df.S1 + summmary_df.S2)
+        summmary_df = summmary_df.sort_values('S1_S2') 
+        summmary_df['P'] = np.sort(df.groupby('INCREMENT').mean()['PRESSURE'].values)
+        
+        summmary_df['S'] = np.sort((summmary_df.S1.values + summmary_df.S2.values) / 2)
         summmary_df['TS'] = summmary_df['S'].cumsum()
         return summmary_df.reset_index()

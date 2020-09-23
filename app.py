@@ -81,9 +81,11 @@ app.layout = html.Div([
      Input('ini-set-1', 'value'),
      Input('ini-set-2', 'value'),
      Input('factor-safety', 'value'),
-     Input('csv-type', 'value')]    
+     Input('csv-type', 'value'),
+     Input('plate-width', 'value'),
+     Input('width-footing', 'value')]    
  )
-def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_area, ini1, ini2, fs, csv_type):
+def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_area, ini1, ini2, fs, csv_type, pw, wf):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     try:
         if ('start-btn' in changed_id 
@@ -94,8 +96,12 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
             and p_area is not None
             and ini1 is not None
             and ini2 is not None
-            and fs is not None):
-            df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2)
+            and fs is not None
+            and pw is not None
+            and wf is not None):
+            print('haiya')
+            df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2,
+                                         w_footing=wf, w_plate = pw, fs = fs)
             ind = 'Process running.'
             fig1, fig2 = scatter_data(df)
             return  fig1, fig2, ind, {'display': 'block'}
@@ -140,7 +146,8 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
                Output('dg-2', 'children'),
                Output('p-fs', 'children'),
                Output('p-time', 'children'),
-               Output('summary', 'style')],
+               Output('summary', 'style'),
+               Output('s-width-footing', 'children')],
         [Input('start-btn', 'n_clicks'),
         Input('port', 'value'),
         Input('test-id', 'value'),
@@ -153,12 +160,14 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
         Input('ini-set-1', 'value'),
         Input('ini-set-2', 'value'),
         Input('plate-area', 'value'),
-        Input('factor-safety', 'value')])
+        Input('factor-safety', 'value'),
+        Input('plate-width', 'value'),
+        Input('width-footing', 'value')])
 def showtimer(btn1, port, 
               id, inc, time_s, 
               btn2, t_id, btn3, 
               t_csv, set1, set2,
-              p_area, fs):
+              p_area, fs, pw, wf):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if ('start-btn' in changed_id 
     and port is not None
@@ -168,14 +177,17 @@ def showtimer(btn1, port,
     and p_area is not None
     and set1 is not None
     and set2 is not None
-    and fs is not None):
+    and fs is not None
+    and pw is not None
+    and wf is not None):
         try:
 
           style_test = {'display': 'none'}
           id = 'Test ID: ' + id 
-          inc = 'Increment no: ' + inc
-          set1 = 'Initial DG-1: ' + str(set1) + 'mm'
-          set2 = 'Initial DG-2: ' + str(set2) + 'mm'
+          inc = 'Increment no: ' + str(inc)
+          set1 = 'Initial DG-1: ' + str(set1) + 'cm'
+          set2 = 'Initial DG-2: ' + str(set2) + 'cm'
+          wf = 'Width of Footing: ' + str(wf) + 'm'
           fs = 'Factor of Safety: ' + str(fs)
           time_x = 'Time: ' + str(time_s) + ' minute/s'
           plus = 1000 + (1500/time_s) 
@@ -183,7 +195,7 @@ def showtimer(btn1, port,
                                           style={'height': '30px',
                                                   'fontSize': '10px'}),
                              dcc.Interval(id="progress-interval", n_intervals=0, interval=plus)], \
-                             id, inc,set1,set2,fs, time_x, {'display': 'inline-block'}
+                             id, inc,set1,set2,fs, time_x, {'display': 'inline-block'}, wf
         except:
           print('ERROR')
           raise PreventUpdate
