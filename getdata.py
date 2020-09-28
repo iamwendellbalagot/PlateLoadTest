@@ -65,6 +65,7 @@ class GetData:
                         fs = 1,
                         path='./databases/serverdb.db'):
         arduino = serial.Serial(port, baud)
+        n = int(n * 60)
         try:
             conn = sqlite3.connect(path)
             c = conn.cursor()
@@ -154,8 +155,10 @@ class GetData:
         set1_per_inc = []
         set2_per_inc = []
         for increment in unik:
-            set1_per_inc.append(df[df['INCREMENT']==increment]['diff1'].iloc[-1])
-            set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-1])
+            percent_to_ave1  = int(len(df[df['INCREMENT']==increment]['diff1']) * 0.1)
+            percent_to_ave2  = int(len(df[df['INCREMENT']==increment]['diff2']) * 0.1)
+            set1_per_inc.append(df[df['INCREMENT']==increment]['diff1'].iloc[-percent_to_ave1:].mean())
+            set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-percent_to_ave2:].mean())
 
         summmary_df['S1'] = np.array(set1_per_inc)
         summmary_df['S2'] = np.array(set2_per_inc)
@@ -165,4 +168,5 @@ class GetData:
         
         summmary_df['S'] = np.sort((summmary_df.S1.values + summmary_df.S2.values) / 2)
         summmary_df['TS'] = summmary_df['S'].cumsum()
-        return summmary_df.reset_index()
+
+        return summmary_df.reset_index(), df['WIDTH_PLATE'].iloc[-1], df['WIDTH_FOOTING'].iloc[-1]

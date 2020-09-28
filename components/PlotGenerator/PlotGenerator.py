@@ -56,8 +56,9 @@ def get_lsc(df, x=[0,50,100,200,300,400,500,600],
             y=[0,1.5,2,4,7.5,12.5, 20, 40.6],
             ubc=500, ubc_s=20):
             
-    x=df.P
-    y = df.S
+    x = np.append(0,df.P)
+    y = np.append(0,df.S)
+    max_settlement = df.S.max()
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x,
                              y=y,
@@ -70,7 +71,7 @@ def get_lsc(df, x=[0,50,100,200,300,400,500,600],
             x0=ubc,
             y0=0,
             x1=ubc,
-            y1=ubc_s,
+            y1=max_settlement,
             line=dict(
                 color="cyan",
                 width=4,

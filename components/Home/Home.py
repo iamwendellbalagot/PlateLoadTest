@@ -409,6 +409,14 @@ home_layout = html.Div(
                 ],
                 id='graph-2',
                 style={'width': '40%', 'display':'inline-block'}),
+            html.Div([
+                html.Ul(
+                    [html.Li('Ultimate Bearing Capacity', id='m1',style={'margin': '0px', 'width': '80%'}),
+                    html.Li('Safe Bearing Capacity', id='m2',style={'margin': '0px', 'width': '80%'}),
+                    html.Li('Settlement of Footing', id='m3',style={'margin': '0px'})],
+                    style={'textAlign': 'left', 'color': '#ccc'}
+                    )
+                ], id='measurements',style={'marginLeft': '10%', 'display': 'none'}),
              
             html.Div(
                 children=[

@@ -122,7 +122,7 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
               raise PreventUpdate
             elif csv_type == 'summary':
               df = getdata.get_dataframe(table=t_csv)
-              df = getdata.get_PS(df)
+              df,_, __ = getdata.get_PS(df)
               df = df[['P', 'S1', 'S2', 'S', 'TS']]
               df.columns = ['Pressure', 'Dial Gauge-1 Reading', 
                             'Dial Gauge-2 Reading',
@@ -190,7 +190,7 @@ def showtimer(btn1, port,
           wf = 'Width of Footing: ' + str(wf) + 'm'
           fs = 'Factor of Safety: ' + str(fs)
           time_x = 'Time: ' + str(time_s) + ' minute/s'
-          plus = 1000 + (1500/time_s) 
+          plus = 1000 + (4000/int(time_s* 60)) 
           return style_test,[dbc.Progress(value=0, id='progressb',color='success',
                                           style={'height': '30px',
                                                   'fontSize': '10px'}),
@@ -209,7 +209,7 @@ def showtimer(btn1, port,
               [Input('time-input', 'value'),
                Input('progress-interval', 'n_intervals')])
 def update_progress(time_s,n):
-    coef = 100 / time_s
+    coef = 100 / int(time_s * 60)
     value = coef * n
     if value <=100:
         return value,str(round(value)) +'%' 
@@ -217,7 +217,11 @@ def update_progress(time_s,n):
         raise PreventUpdate
 
 #RESULTS CALLBACK
-@app.callback(Output('lsc', 'figure'),
+@app.callback([Output('lsc', 'figure'),
+               Output('measurements', 'style'),
+               Output('m1', 'children'),
+               Output('m2', 'children'),
+               Output('m3', 'children')],
              [Input('gen-res', 'n_clicks'),
               Input('inp-sc', 'value')])
 def generateUBC(n, inp):
@@ -230,12 +234,17 @@ def generateUBC(n, inp):
           dummy.columns = ['P', 'S']
 
           dataf  = getdata.get_dataframe(table=inp)
-          ps = getdata.get_PS(dataf)
-          print(ps)
+          fos = dataf.FOS.iloc[-1]
+          ps, bp, b = getdata.get_PS(dataf)
+          
 
           ubc,sett, idx = getdata.get_ubc(df=ps)
+          sf = round(sett*(b/bp), 2)
+          m1 = 'Ultimate Bearing Capacity: ' + str(round(ubc, 2))
+          m2 = 'Safe Bearing Capacity: ' + str(round(ubc/fos, 2))
+          m3 = 'Settlement of Footing: ' + str(sf)
           fig = get_lsc(ps, ubc=ubc, ubc_s=sett)
-          return fig
+          return fig, {'display': 'block', 'marginLeft': '10%'}, m1, m2, m3
         except:
           raise PreventUpdate
         
@@ -318,21 +327,6 @@ def display_page(pathname):
         return 'Server shutting down...'
     else:
         return home_layout
-
-
-
-# @app.callback(Output('url', 'pathname'),
-#               [Input('back-dash', 'n_clicks'),
-#                Input('start-an-btn', 'n_clicks'),
-#                Input('calib-link', 'n_clicks')])
-# def display_page(btn1, btn2, btn3):
-#     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-#     if 'back-dash' in changed_id or 'start-an-btn' in changed_id:
-#         return '/'
-#     elif 'calib-link' in changed_id:
-#         return '/calibration'
-#     else:
-#         raise PreventUpdate
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=2020)

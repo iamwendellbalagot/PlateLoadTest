@@ -62,7 +62,7 @@ void loop() {
 
   d1 = (d1/SIZE);
   d2 = (d2/SIZE);
-  loadc = loadc - 0.35;
+  loadc = loadc - 0.40;
   if (loadc <0){
     loadc = 0.0;
   }
