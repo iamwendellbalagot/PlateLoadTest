@@ -12,6 +12,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import dash_html_components as html
 from dash.exceptions import PreventUpdate
+from dash.dash import no_update
 
 
 import plotly.express as px
@@ -81,32 +82,34 @@ app.layout = html.Div([
      Input('ini-set-1', 'value'),
      Input('ini-set-2', 'value'),
      Input('factor-safety', 'value'),
-     Input('csv-type', 'value'),
      Input('plate-width', 'value'),
      Input('width-footing', 'value')]    
  )
-def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_area, ini1, ini2, fs, csv_type, pw, wf):
+def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_area, ini1, ini2, fs, pw, wf):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     try:
-        if ('start-btn' in changed_id 
-            and port is not None
-            and id is not None
-            and inc is not None
-            and time_s is not None
-            and p_area is not None
-            and ini1 is not None
-            and ini2 is not None
-            and fs is not None
-            and pw is not None
-            and wf is not None):
-            print('haiya')
-            df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2,
-                                         w_footing=wf, w_plate = pw, fs = fs)
-            ind = 'Process running.'
-            fig1, fig2 = scatter_data(df)
-            return  fig1, fig2, ind, {'display': 'block'}
+        try:
+          if ('start-btn' in changed_id 
+              and port is not None
+              and id is not None
+              and inc is not None
+              and time_s is not None
+              and p_area is not None
+              and ini1 is not None
+              and ini2 is not None
+              and fs is not None
+              and pw is not None
+              and wf is not None):
+              print('haiya')
+              df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2,
+                                           w_footing=wf, w_plate = pw, fs = fs)
+              ind = 'Process running.'
+              fig1, fig2 = scatter_data(df)
+              return  fig1, fig2, ind, {'display': 'block'}
+        except:
+          return no_update, no_update, 'Error Detected', no_update
             
-        elif 'view1' in changed_id:
+        if 'view1' in changed_id:
             try:
                 df = getdata.get_dataframe(table=t_id)
                 ind = 'Click the button to start a test.'
@@ -116,20 +119,15 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
                 raise PreventUpdate
         
         elif 'view2' in changed_id:
-            if csv_type == 'complete':
-              df = getdata.get_dataframe(table=t_csv)
-              df.to_csv('./excelfiles/'+t_csv+'.csv')
-              raise PreventUpdate
-            elif csv_type == 'summary':
-              df = getdata.get_dataframe(table=t_csv)
-              df,_, __ = getdata.get_PS(df)
-              df = df[['P', 'S1', 'S2', 'S', 'TS']]
-              df.columns = ['Pressure', 'Dial Gauge-1 Reading', 
-                            'Dial Gauge-2 Reading',
-                            'Avereage Settlement',
-                            'Total Settlement']
-              df.to_csv('./excelfiles/'+t_csv+'.csv')
-              raise PreventUpdate
+            df = getdata.get_dataframe(table=t_csv)
+            df,_, __ = getdata.get_PS(df)
+            df = df[['P', 'S1', 'S2', 'S', 'TS']]
+            df.columns = ['Pressure', 'Dial Gauge-1 Reading', 
+                          'Dial Gauge-2 Reading',
+                          'Avereage Settlement',
+                          'Total Settlement']
+            df.to_csv('./excelfiles/'+t_csv+'.csv')
+            raise PreventUpdate
         else:
             raise PreventUpdate
     except:
@@ -239,7 +237,8 @@ def generateUBC(n, inp):
           
 
           ubc,sett, idx = getdata.get_ubc(df=ps)
-          sf = round(sett*(b/bp), 2)
+          print(b, bp, sett)
+          sf = round(((sett/1000) * ((b*(bp+0.3)) / (bp*(b+0.3)))**2)*1000,2)
           m1 = 'Ultimate Bearing Capacity: ' + str(round(ubc, 2))
           m2 = 'Safe Bearing Capacity: ' + str(round(ubc/fos, 2))
           m3 = 'Settlement of Footing: ' + str(sf)
@@ -263,10 +262,12 @@ def calibrationHandler(btn1, inp):
             serial.Serial(inp, 9600)
             ind = 'Device found'
             style={'color': 'lightgreen', 'fontSize':'15px'}
+            time.sleep(1)
             return ind, style
         except:
             ind = 'Device not found'
             style={'color': 'salmon', 'fontSize':'15px'}
+            time.sleep(1)
             return ind, style
     else:
         raise PreventUpdate

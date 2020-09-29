@@ -212,12 +212,13 @@ home_layout = html.Div(
                         'fontSize': '12px',
                         'padding': '5px'
                     }),
-                html.Div(children='Click the button to start a test',
-                     id='test-indicator', 
-                     style={'color': 'gray', 
-                            'borderBottom': '1px solid grey',
-                            'paddingBottom': '20px',
-                            'fontSize': '10px'}), 
+                html.Div(children=
+                     html.P(['Click the button to start a test'],
+                             id='test-indicator',
+                             style = {'color': 'gray', 'fontSize': '10px'}
+                             ),
+                     style={'borderBottom': '1px solid grey',
+                            'paddingBottom': '20px'}), 
                 ],
             id='start-test'
             ),
@@ -348,19 +349,6 @@ home_layout = html.Div(
                         style={'height': '30px',
                                 'fontSize': '12px',
                                 'padding': '5px'}
-                    ),
-                    html.Div(
-                        dbc.RadioItems(
-                        options=[
-                            {'label': 'Summary', 'value': 'summary'},
-                            {'label': 'Complete', 'value': 'complete'}
-                        ],
-                        value='summary',
-                        id = 'csv-type',
-                        labelStyle={'display': 'inline-block', 'color': 'gray'}),
-                        style = {'display': 'block', 
-                                 'top': '40px',
-                                 'position': 'absolute'}
                     ),
                 ],
                 className='input-group mb-3',

@@ -1,6 +1,6 @@
 import dash_html_components as html
 import dash_core_components as dcc
-
+import dash_bootstrap_components as dbc
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
@@ -57,11 +57,17 @@ calibration_layout = html.Div(
                 className='input-group mb-3',
                 style={'width': '100%', 'margin': '10px auto 30px auto'}
             ),
-            
-            html.Div(children='',
-                     id='ca-ind', 
-                     style={'color': 'lightgreen', 'fontSize':'15px'}),
-            
+            html.Div(style={'paddingTop': '5px'}),
+            html.Div([
+                dcc.Loading(
+                    html.Div(children='',
+                             id='ca-ind', 
+                             style={'color': 'lightgreen', 'fontSize':'15px'}),
+                    type= 'dot',
+                    color='steelblue'
+                )]
+            ),
+            html.Div(style={'paddingTop': '5px'}),
             html.H6('CHECK SENSORS OUTPUT',
                         style={'display': 'block',
                                 'color': 'white',
