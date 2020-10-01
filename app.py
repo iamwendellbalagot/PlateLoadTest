@@ -48,6 +48,7 @@ app = dash.Dash(
     external_stylesheets=external_stylesheets
 )
 
+
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
@@ -68,7 +69,8 @@ app.layout = html.Div([
     [Output('disp-sensor', 'figure'),
      Output('load-sensor', 'figure'),
      Output('test-indicator', 'children'),
-     Output('start-an-btn', 'style')],
+     Output('start-an-btn', 'style'),
+     Output('loader_csv', 'children')],
     [Input('start-btn', 'n_clicks'),
      Input('port', 'value'),
      Input('test-id', 'value'),
@@ -100,38 +102,38 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
               and fs is not None
               and pw is not None
               and wf is not None):
-              print('haiya')
               df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2,
                                            w_footing=wf, w_plate = pw, fs = fs)
               ind = 'Process running.'
               fig1, fig2 = scatter_data(df)
-              return  fig1, fig2, ind, {'display': 'block'}
+              return  fig1, fig2, ind, {'display': 'block'}, no_update
         except:
-          return no_update, no_update, 'Error Detected', no_update
+          return no_update, no_update, 'Error Detected', no_update, no_update
             
         if 'view1' in changed_id:
             try:
                 df = getdata.get_dataframe(table=t_id)
                 ind = 'Click the button to start a test.'
                 fig1, fig2 = scatter_data(df)
-                return  fig1, fig2, ind, {'display': 'none'}
+                return  fig1, fig2, ind, {'display': 'none'}, no_update
             except:
                 raise PreventUpdate
         
         elif 'view2' in changed_id:
             df = getdata.get_dataframe(table=t_csv)
             df,_, __ = getdata.get_PS(df)
-            df = df[['P', 'S1', 'S2', 'S', 'TS']]
-            df.columns = ['Pressure', 'Dial Gauge-1 Reading', 
+            df = df[['P', 'INC_NO','TIME','S1', 'S2', 'S', 'TS']].round(2)
+            df.columns = ['Pressure (Kg/m^2)', 'Increment No.',
+                          'Time (minute/s)','Dial Gauge-1 Reading', 
                           'Dial Gauge-2 Reading',
-                          'Avereage Settlement',
-                          'Total Settlement']
+                          'Avereage Settlement (mm)',
+                          'Total Settlement (mm)']
+            time.sleep(1)
             df.to_csv('./excelfiles/'+t_csv+'.csv')
             raise PreventUpdate
         else:
             raise PreventUpdate
     except:
-        print('START ERR')
         raise PreventUpdate
 
 
@@ -188,17 +190,15 @@ def showtimer(btn1, port,
           wf = 'Width of Footing: ' + str(wf) + 'm'
           fs = 'Factor of Safety: ' + str(fs)
           time_x = 'Time: ' + str(time_s) + ' minute/s'
-          plus = 1000 + (4000/int(time_s* 60)) 
+          plus = 1100
           return style_test,[dbc.Progress(value=0, id='progressb',color='success',
                                           style={'height': '30px',
                                                   'fontSize': '10px'}),
                              dcc.Interval(id="progress-interval", n_intervals=0, interval=plus)], \
                              id, inc,set1,set2,fs, time_x, {'display': 'inline-block'}, wf
         except:
-          print('ERROR')
           raise PreventUpdate
     else:
-        print('TIMER ERR')
         raise PreventUpdate
 
 #PROGRESS BAR CALLBACK
@@ -207,7 +207,8 @@ def showtimer(btn1, port,
               [Input('time-input', 'value'),
                Input('progress-interval', 'n_intervals')])
 def update_progress(time_s,n):
-    coef = 100 / int(time_s * 60)
+    time_s = time_s * 60
+    coef = 100 / int(time_s)
     value = coef * n
     if value <=100:
         return value,str(round(value)) +'%' 
@@ -237,7 +238,6 @@ def generateUBC(n, inp):
           
 
           ubc,sett, idx = getdata.get_ubc(df=ps)
-          print(b, bp, sett)
           sf = round(((sett/1000) * ((b*(bp+0.3)) / (bp*(b+0.3)))**2)*1000,2)
           m1 = 'Ultimate Bearing Capacity: ' + str(round(ubc, 2))
           m2 = 'Safe Bearing Capacity: ' + str(round(ubc/fos, 2))
@@ -259,11 +259,14 @@ def calibrationHandler(btn1, inp):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if 'check-port' in changed_id:
         try:
-            serial.Serial(inp, 9600)
-            ind = 'Device found'
-            style={'color': 'lightgreen', 'fontSize':'15px'}
-            time.sleep(1)
-            return ind, style
+            if inp:
+              serial.Serial(inp, 9600)
+              ind = 'Device found'
+              style={'color': 'lightgreen', 'fontSize':'15px'}
+              time.sleep(1)
+              return ind, style
+            else:
+              raise PreventUpdate
         except:
             ind = 'Device not found'
             style={'color': 'salmon', 'fontSize':'15px'}
@@ -273,7 +276,8 @@ def calibrationHandler(btn1, inp):
         raise PreventUpdate
         
 #[RUN CALIBRATION]
-@app.callback([Output('ca-disp-sensor', 'children')],
+@app.callback([Output('ca-disp-sensor', 'children'),
+               Output('ca-test-indicator', 'children')],
               [Input('ca-start-btn', 'n_clicks'),
                Input('ca-port-id', 'value'),
                Input('ca-clear-btn', 'n_clicks')])
@@ -282,7 +286,7 @@ def run_calibration(btn,port, clear):
     if 'ca-start-btn' in changed_id:
         
         try:
-            print(btn)
+            time.sleep(0)
             getdata.upload_data(port= port, baud=9600, n=10, table='test', inc='test')
             raise PreventUpdate
         except:
@@ -311,7 +315,6 @@ def update_plot(n):
         fig1, fig2 = scatter_data(df, height=400)
         return fig1, fig2
     except:
-        print('ERROR')
         raise PreventUpdate
         
 #ROUTING CALLBACK
@@ -329,6 +332,5 @@ def display_page(pathname):
     else:
         return home_layout
 
-if __name__ == '__main__':
-    app.run_server(debug=True, port=2020)
-    #ui.run()
+app.run_server(debug=True, port=2020)
+#ui.run()

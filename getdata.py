@@ -82,19 +82,16 @@ class GetData:
                 data.append(w_plate)
                 data.append(w_footing)
                 data.append(fs)
-                data.append(n)
+                data.append(round(n/60))
                 readings.append(data)
                 
                 c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?,?,?,?,?,?);',tuple(data));
                 conn.commit()
-            print('FFF')
             df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2',
                                                  'PLATE_AREA', 'WIDTH_PLATE', 'WIDTH_FOOTING', 'FOS', 'TIME'])
-            print('DF RETURNED')
             return df
             conn.close()
         except:
-            print('DUPP')
             conn.close()
             query = '''CREATE TABLE IF NOT EXISTS {0} (
                                         S1 REAL,
@@ -126,14 +123,13 @@ class GetData:
                 data.append(w_plate)
                 data.append(w_footing)
                 data.append(fs)
-                data.append(n)
+                data.append(round(n/60))
                 readings.append(data)
                 
                 c.execute('INSERT INTO '+ table +' VALUES(?,?,?,?,?,?,?,?,?,?,?,?);',tuple(data));
                 conn.commit()
             df = pd.DataFrame(readings, columns=['S1', 'S2', 'S3', 'INCREMENT', 'PRESSURE', 'SET1', 'SET2',
                                                  'PLATE_AREA', 'WIDTH_PLATE', 'WIDTH_FOOTING', 'FOS', 'TIME'])
-            print('DF2 RETURNED')
             return df
             conn.close()
         
@@ -154,11 +150,13 @@ class GetData:
         unik = df.INCREMENT.unique()
         set1_per_inc = []
         set2_per_inc = []
+        time_per_inc = []
         for increment in unik:
             percent_to_ave1  = int(len(df[df['INCREMENT']==increment]['diff1']) * 0.1)
             percent_to_ave2  = int(len(df[df['INCREMENT']==increment]['diff2']) * 0.1)
             set1_per_inc.append(df[df['INCREMENT']==increment]['diff1'].iloc[-percent_to_ave1:].mean())
             set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-percent_to_ave2:].mean())
+            time_per_inc.append(int(df[df['INCREMENT']==increment]['TIME_OF_TEST'].iloc[-1]))
 
         summmary_df['S1'] = np.array(set1_per_inc)
         summmary_df['S2'] = np.array(set2_per_inc)
@@ -168,5 +166,7 @@ class GetData:
         
         summmary_df['S'] = np.sort((summmary_df.S1.values + summmary_df.S2.values) / 2)
         summmary_df['TS'] = summmary_df['S'].cumsum()
+        summmary_df['TIME'] = time_per_inc
+        summmary_df['INC_NO'] = ['Increment '+ str(int(inc)) for inc in unik]
 
         return summmary_df.reset_index(), df['WIDTH_PLATE'].iloc[-1], df['WIDTH_FOOTING'].iloc[-1]

@@ -327,33 +327,38 @@ home_layout = html.Div(
                                 'color': 'white',
                                 'marginTop': '20px'}),
             html.Div(
-                children=[
-                    html.Div(
-                        children=[
-                            html.Button(
-                                children='Generate',
-                                id = 'view2',
-                                className='btn btn-dark',
-                                style={'height': '30px',
-                                        'fontSize': '12px',
-                                        'padding': '5px'}
-                            )
-                        ],
-                        className='input-group-prepend'
-                    ),
-                    dcc.Input(
-                        id= 'inp-csv',
-                        placeholder='Test ID',
-                        type='text',
-                        className='form-control',
-                        style={'height': '30px',
-                                'fontSize': '12px',
-                                'padding': '5px'}
-                    ),
-                ],
-                className='input-group mb-3',
-                style={'width': '100%', 
-                       'margin': '10px auto 30px auto'}
+                    children=[
+                        html.Div(
+                            children=[
+                                html.Button(
+                                    children='Generate',
+                                    id = 'view2',
+                                    className='btn btn-dark',
+                                    style={'height': '30px',
+                                            'fontSize': '12px',
+                                            'padding': '5px'}
+                                )
+                            ],
+                            className='input-group-prepend'
+                        ),
+                        dcc.Input(
+                            id= 'inp-csv',
+                            placeholder='Test ID',
+                            type='text',
+                            className='form-control',
+                            style={'height': '30px',
+                                    'fontSize': '12px',
+                                    'padding': '5px'}
+                        ),
+                    ],
+                    className='input-group mb-3',
+                    style={'width': '100%', 
+                           'margin': '10px auto 30px auto'}),
+            html.Br(),
+            dcc.Loading(
+                html.Div(id= 'loader_csv'),
+                type='dot',
+                color = 'lightgreen'
             ),
             html.P('Back to dashboard',
                     id='back-dash',

@@ -74,23 +74,28 @@ calibration_layout = html.Div(
                                 'margin': '10px auto',
                                 'fontSize': '14px'}),
             
-            
-            html.Button(
-                'Generate',
+            html.Div(
+                html.Button('Generate',
                 className='btn btn-dark btn-lg btn-block',
                 id = 'ca-start-btn',
                 n_clicks=0,
                 style = {
                     'display': 'block',
                     'position': 'relative'
-                }),
-            html.Div(children='Click the button to start a test',
-                 id='ca-test-indicator', 
-                 style={'color': 'white', 
-                        'borderBottom': '1px solid grey',
-                        'padding': '10px 0 20px 0',
-                        'fontSize': '10px', 'color': 'grey'}),
-                        
+                })),
+            
+            dcc.Loading(
+                    children= html.Div(children='Click the button to start a test',
+                                     id='ca-test-indicator', 
+                                     style={'color': 'white', 
+                                            'borderBottom': '1px solid grey',
+                                            'padding': '10px 0 20px 0',
+                                            'fontSize': '10px', 'color': 'grey'}),
+                    type='default',
+                    color='lightgreen'
+                ),
+
+                      
             dcc.Link('Back to Dashboard',
                     id='back-dash',
                     style={'textDecoration': 'underline',
