@@ -1,3 +1,4 @@
+import chart_studio.plotly as py
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
@@ -27,7 +28,7 @@ def scatter_data(df, height=300):
                           yaxis=dict(range=[0,100]),
                           font=dict(family="Courier",
                                     size=12, color='gray'))                         
-        fig1.update_xaxes(title='Time')
+        fig1.update_xaxes(title='Time Interval [1s]')
         fig1.update_yaxes(title='Centimeter')
 
         #[Scatterplot 2]
@@ -44,7 +45,7 @@ def scatter_data(df, height=300):
                           height=height,
                           font=dict(family="Courier",
                                     size=12, color='gray'))                         
-        fig2.update_xaxes(title='Time')
+        fig2.update_xaxes(title='Time Interval [1s]')
         fig2.update_yaxes(title='Kg')
         
         return fig1, fig2

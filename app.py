@@ -14,7 +14,7 @@ import dash_html_components as html
 from dash.exceptions import PreventUpdate
 from dash.dash import no_update
 
-
+import chart_studio.plotly as py
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -31,18 +31,17 @@ external_scripts = Bootstrap().getScripts()
 external_stylesheets = Bootstrap().getStylesheet()
 
 #Initilize Layouts
-from components.ShowTable.ShowTable import showdata_layout
 from components.Home.Home import home_layout
 from components.CalibrationLayout.CalibrationLayout import calibration_layout
 
-from flaskwebgui import FlaskUI #get the FlaskUI class
+#from flaskwebgui import FlaskUI #get the FlaskUI class
 server = flask.Flask(__name__)
 #ui = FlaskUI(server, port=2020)
 
 app = dash.Dash(
     __name__,
-    title='Plate Load Test',
-    server=server,
+    server = server,
+    title='Digital Plate Load Test',
     suppress_callback_exceptions = True,
     external_scripts=external_scripts,
     external_stylesheets=external_stylesheets
@@ -324,13 +323,12 @@ def display_page(pathname):
     
     if pathname == '/calibration':
         return calibration_layout
-    elif pathname == '/showdata':
-        return showdata_layout
     elif pathname == '/shutdown':
         shutdown_server()
         return 'Server shutting down...'
     else:
         return home_layout
 
-app.run_server(debug=True, port=2020)
-#ui.run()
+if __name__ == '__main__':
+  app.run_server(debug=True, port=2020)
+  #ui.run()

@@ -23,13 +23,18 @@ lsc = get_lsc(dummy_lsc)
 
 items = [
     dbc.DropdownMenuItem(
+            html.A("Dashboard", id = 'dash-app', href='/',
+                     style = {'color': 'black',
+                              ':hover': {'color': 'black'}}),
+            style={'height':'20px', 'width': '200px' }
+        ),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem(
         dcc.Link("Calibration", id = 'calib-link', href='/calibration',
                  style = {'color': 'black',
                           ':hover': {'color': 'black'}}),
         style={'height':'20px', 'width': '200px' }
     ),
-    dbc.DropdownMenuItem(divider=True),
-    dbc.DropdownMenuItem("View test data", id='view-data-link', style={'height':'20px', 'width': '200px' }),
     dbc.DropdownMenuItem(divider=True),
     dbc.DropdownMenuItem(
         dcc.Link("Close application", id = 'exit-app', href='/shutdown',
