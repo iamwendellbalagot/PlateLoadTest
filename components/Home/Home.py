@@ -61,7 +61,6 @@ home_layout = html.Div(
     children=[
         
         html.Div([
-            dcc.Input(id = 'check-port-status', style={'display': 'none'}, type='number'),
             html.Div([
                 dbc.DropdownMenu(label="Menu", 
                                  bs_size="sm", 
@@ -74,7 +73,7 @@ home_layout = html.Div(
             html.Div([
                 
                 #[Device info]
-                html.H4('CREATE A TEST',
+                html.H6('CREATE A TEST',
                         style={'display': 'block',
                                 'color': 'white',
                                 'margin': '10px auto'}),
@@ -293,7 +292,7 @@ home_layout = html.Div(
                         'padding': '5px'
                     }),
                  
-            html.H4('CHECK TEST RESULTS',
+            html.H6('CHECK TEST RESULTS',
                         style={'display': 'block',
                                 'color': 'white',
                                 'marginTop': '20px'}),
@@ -327,7 +326,7 @@ home_layout = html.Div(
                 style={'width': '100%', 'margin': '10px auto 30px auto'}
             ),
             
-            html.H4('GENERATE A EXCEL FILE',
+            html.H6('GENERATE A EXCEL FILE',
                         style={'display': 'block',
                                 'color': 'white',
                                 'marginTop': '20px'}),
@@ -373,6 +372,7 @@ home_layout = html.Div(
                    'margin': '0 auto',
                    'marginTop':'10px',
                    'paddingTop': '20px',
+                   'paddingBottom': '30px',
                    'backgroundColor': '#1b1c25',
                    'borderRadius': '5px'},
             className='col-6 col-md-2'
@@ -381,7 +381,7 @@ home_layout = html.Div(
         
     
         html.Div([
-            html.H2(children='PLATE LOAD TEST DASHBOARD',
+            html.H4(children='PLATE LOAD TEST DASHBOARD',
                     style={'color':'white',
                            'fontFamily': 'sans-serif',
                            'fontWeight': '700',

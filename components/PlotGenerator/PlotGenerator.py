@@ -10,45 +10,53 @@ from getdata import GetData
 
 getdata = GetData()
 
-def scatter_data(df, height=300):
-        fig1 = go.Figure()
-        fig1.add_trace(go.Scatter(x=np.arange(len(df)),
-                                 y=df.S1,
-                                 name='Sensor 1',
-                                 marker_color='steelblue'))
-        fig1.add_trace(go.Scatter(x=np.arange(len(df)),
-                                 y=df.S2,
-                                 name='Sensor 2',
-                                 marker_color='lightgreen'))
-        fig1.update_layout(title=dict(
-                          text='<b>DISTANCE SENSORS OUTPUT</b>',
-                          font=dict(size=20, color='white')), 
-                          template='plotly_dark',
-                          height=height,
-                          yaxis=dict(range=[0,100]),
-                          font=dict(family="Courier",
-                                    size=12, color='gray'))                         
-        fig1.update_xaxes(title='Time Interval [1s]')
-        fig1.update_yaxes(title='Centimeter')
+def scatter_data(df, height=300, plotType = ''):
+      y1 = df.S1
+      y2 = df.S2
+      
+      if plotType == 'normal':
+         y1 = np.sort(df.S1.values)
+         y2 = np.sort(df.S2.values)
+         
+      fig1 = go.Figure()
+      fig1.add_trace(go.Scatter(x=np.arange(len(df)),
+                               y= y1,
+                               name='Sensor 1',
+                               marker_color='steelblue'))
+      fig1.add_trace(go.Scatter(x=np.arange(len(df)),
+                               y=y2,
+                               name='Sensor 2',
+                               marker_color='lightgreen'))
+      fig1.update_layout(title=dict(
+                        text='<b>DISTANCE SENSORS OUTPUT</b>',
+                        font=dict(size=20, color='white')), 
+                        template='plotly_dark',
+                        height=height,
+                        yaxis=dict(range=[0,100]),
+                        font=dict(family="Courier",
+                                  size=12, color='gray'))                         
+      fig1.update_xaxes(title='Time Interval [1s]')
+      fig1.update_yaxes(title='Centimeter')
 
-        #[Scatterplot 2]
-        fig2 = go.Figure()
-        fig2.add_trace(go.Scatter(x=np.arange(len(df)),
-                                 y=df.S3,
-                                 name='Sensor 3',
-                                 marker_color='salmon'))
+      #[Scatterplot 2]
+      fig2 = go.Figure()
+      fig2.add_trace(go.Scatter(x=np.arange(len(df)),
+                               y=df.S3,
+                               name='Sensor 3',
+                               marker_color='salmon'))
 
-        fig2.update_layout(title=dict(
-                          text='<b>LOAD SENSOR OUTPUT</b>',
-                          font=dict(size=20, color='white')), 
-                          template='plotly_dark',
-                          height=height,
-                          font=dict(family="Courier",
-                                    size=12, color='gray'))                         
-        fig2.update_xaxes(title='Time Interval [1s]')
-        fig2.update_yaxes(title='Kg')
-        
-        return fig1, fig2
+      fig2.update_layout(title=dict(
+                        text='<b>LOAD SENSOR OUTPUT</b>',
+                        font=dict(size=20, color='white')), 
+                        template='plotly_dark',
+                        height=height,
+                        font=dict(family="Courier",
+                                  size=12, color='gray'))                         
+      fig2.update_xaxes(title='Time Interval [1s]')
+      fig2.update_yaxes(title='Kg')
+      
+      return fig1, fig2
+
 
 
         

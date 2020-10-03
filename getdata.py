@@ -158,8 +158,8 @@ class GetData:
             set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-percent_to_ave2:].mean())
             time_per_inc.append(int(df[df['INCREMENT']==increment]['TIME_OF_TEST'].iloc[-1]))
 
-        summmary_df['S1'] = np.array(set1_per_inc)
-        summmary_df['S2'] = np.array(set2_per_inc)
+        summmary_df['S1'] = np.sort(np.array(set1_per_inc))
+        summmary_df['S2'] = np.sort(np.array(set2_per_inc))
         summmary_df['S1_S2'] = np.array(summmary_df.S1 + summmary_df.S2)
         summmary_df = summmary_df.sort_values('S1_S2') 
         summmary_df['P'] = np.sort(df.groupby('INCREMENT').mean()['PRESSURE'].values)

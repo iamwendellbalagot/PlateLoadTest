@@ -26,9 +26,9 @@ from components.PlotGenerator.PlotGenerator import scatter_data, get_lsc
 
 
 #Get Bootstrap
-from style.bootstrap import Bootstrap
-external_scripts = Bootstrap().getScripts()
-external_stylesheets = Bootstrap().getStylesheet()
+# from style.bootstrap import Bootstrap
+# external_scripts = Bootstrap().getScripts()
+# external_stylesheets = Bootstrap().getStylesheet()
 
 #Initilize Layouts
 from components.Home.Home import home_layout
@@ -43,8 +43,9 @@ app = dash.Dash(
     server = server,
     title='Digital Plate Load Test',
     suppress_callback_exceptions = True,
-    external_scripts=external_scripts,
-    external_stylesheets=external_stylesheets
+    # external_scripts=external_scripts,
+    # external_stylesheets=external_stylesheets
+    #external_stylesheets = [dbc.themes.BOOTSTRAP]
 )
 
 
@@ -104,7 +105,7 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
               df = getdata.upload_generate(port= port, baud=9600, n=time_s, table=id, inc=inc, area=p_area, set1=ini1, set2=ini2,
                                            w_footing=wf, w_plate = pw, fs = fs)
               ind = 'Process running.'
-              fig1, fig2 = scatter_data(df)
+              fig1, fig2 = scatter_data(df, plotType = 'normal')
               return  fig1, fig2, ind, {'display': 'block'}, no_update
         except:
           return no_update, no_update, 'Error Detected', no_update, no_update
@@ -113,7 +114,7 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
             try:
                 df = getdata.get_dataframe(table=t_id)
                 ind = 'Click the button to start a test.'
-                fig1, fig2 = scatter_data(df)
+                fig1, fig2 = scatter_data(df, plotType = 'normal')
                 return  fig1, fig2, ind, {'display': 'none'}, no_update
             except:
                 raise PreventUpdate
@@ -237,10 +238,11 @@ def generateUBC(n, inp):
           
 
           ubc,sett, idx = getdata.get_ubc(df=ps)
+          sett = sett * 0.7
           sf = round(((sett/1000) * ((b*(bp+0.3)) / (bp*(b+0.3)))**2)*1000,2)
-          m1 = 'Ultimate Bearing Capacity: ' + str(round(ubc, 2))
-          m2 = 'Safe Bearing Capacity: ' + str(round(ubc/fos, 2))
-          m3 = 'Settlement of Footing: ' + str(sf)
+          m1 = 'Ultimate Bearing Capacity:' + str(round(ubc, 2)) + ' Kg/m^2'
+          m2 = 'Safe Bearing Capacity: ' + str(round(ubc/fos, 2)) + ' Kg/m^2'
+          m3 = 'Settlement of Footing: ' + str(sf) + ' mm'
           fig = get_lsc(ps, ubc=ubc, ubc_s=sett)
           return fig, {'display': 'block', 'marginLeft': '10%'}, m1, m2, m3
         except:
