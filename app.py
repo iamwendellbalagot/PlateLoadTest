@@ -114,7 +114,7 @@ def startTestHandler(btn1, port, id, inc, time_s, btn2, t_id, btn3, t_csv, p_are
             try:
                 df = getdata.get_dataframe(table=t_id)
                 ind = 'Click the button to start a test.'
-                fig1, fig2 = scatter_data(df, plotType = 'normal')
+                fig1, fig2 = scatter_data(df, plotType = 'normal', table = t_id)
                 return  fig1, fig2, ind, {'display': 'none'}, no_update
             except:
                 raise PreventUpdate

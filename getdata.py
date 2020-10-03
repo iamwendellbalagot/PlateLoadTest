@@ -152,8 +152,8 @@ class GetData:
         set2_per_inc = []
         time_per_inc = []
         for increment in unik:
-            percent_to_ave1  = int(len(df[df['INCREMENT']==increment]['diff1']) * 0.1)
-            percent_to_ave2  = int(len(df[df['INCREMENT']==increment]['diff2']) * 0.1)
+            percent_to_ave1  = int(len(df[df['INCREMENT']==increment]['diff1']) * 0.05)
+            percent_to_ave2  = int(len(df[df['INCREMENT']==increment]['diff2']) * 0.05)
             set1_per_inc.append(df[df['INCREMENT']==increment]['diff1'].iloc[-percent_to_ave1:].mean())
             set2_per_inc.append(df[df['INCREMENT']==increment]['diff2'].iloc[-percent_to_ave2:].mean())
             time_per_inc.append(int(df[df['INCREMENT']==increment]['TIME_OF_TEST'].iloc[-1]))

@@ -10,11 +10,11 @@ from getdata import GetData
 
 getdata = GetData()
 
-def scatter_data(df, height=300, plotType = ''):
+def scatter_data(df, height=300, plotType = '', table=''):
       y1 = df.S1
       y2 = df.S2
-      
-      if plotType == 'normal':
+
+      if plotType == 'normal' and table != 'test':
          y1 = np.sort(df.S1.values)
          y2 = np.sort(df.S2.values)
          
