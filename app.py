@@ -18,6 +18,7 @@ import chart_studio.plotly as py
 import plotly.express as px
 import plotly.graph_objects as go
 
+
 #Initialize getdata 
 from getdata import GetData
 getdata = GetData()
