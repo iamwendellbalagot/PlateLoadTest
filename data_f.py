@@ -9,15 +9,12 @@ def create_df():
     in4 = np.linspace(19.98, 21.24, 1200)
     in5 = np.linspace(21.24, 24.62, 2400)
 
-
     in1_ = np.linspace(19.27 + 0.12, 19.35+ 0.12, 60)
     in2_ = np.linspace(19.35+ 0.12, 19.51+ 0.12, 240)
     in3_ = np.linspace(19.51+ 0.12, 19.98+ 0.12, 600)
     in4_ = np.linspace(19.98+ 0.12, 21.24+ 0.12, 1200)
     in5_ = np.linspace(21.24+ 0.12, 24.62+ 0.12, 2400)
     
-    
-
     s1 = np.concatenate([in1,in2, in3, in4, in5])
     s2 = np.concatenate([in1_,in2_, in3_, in4_, in5_])
     
